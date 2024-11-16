@@ -15,8 +15,8 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.email "youremail@example.com"
-          git config --global user.name "Your Name"
+          git config --global user.email "hasnainrazalakhani7212@gamil.com"
+          git config --global user.name "Hasnain7212"
 
       - name: Set up Node.js
         uses: actions/setup-node@v3  # Setup Node.js environment

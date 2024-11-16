@@ -13,6 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3  # Checkout your repository code
 
+      - name: Set up Git
+        run: |
+          git config --global user.email "youremail@example.com"
+          git config --global user.name "Your Name"
+
       - name: Set up Node.js
         uses: actions/setup-node@v3  # Setup Node.js environment
         with:

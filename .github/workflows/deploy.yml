@@ -1,0 +1,48 @@
+name: Deploy React App to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Trigger deployment on pushes to the main branch
+    tags:
+      - 'v*'  # Trigger deployment on version tags (e.g., v1.0.0)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu environment
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3  # Checkout your repository code
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "hasnainrazalakhani7212@gmail.com"
+          git config --global user.name "Hasnain7212"
+          git config --global url."https://${GH_DEPLOY_TOKEN}@github.com/".insteadOf "https://github.com/"
+        env:
+          GH_DEPLOY_TOKEN: ${{ secrets.GH_DEPLOY_TOKEN }}  # Use the custom PAT for authentication
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3  # Setup Node.js environment
+        with:
+          node-version: '16'  # Ensure the correct version for your project
+
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install  # Install app dependencies
+
+      - name: Build the app
+        run: npm run build  # Build the React app
+
+      - name: Deploy to GitHub Pages
+        run: npm run deploy  # Deploy using the gh-pages package
+        env:
+          GH_DEPLOY_TOKEN: ${{ secrets.GH_DEPLOY_TOKEN }}  # Use the custom PAT for authentication

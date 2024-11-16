@@ -2,33 +2,28 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Layout, ConfigProvider } from 'antd';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import * as Icons from '@ant-design/icons';
 import metadata from './metadata.json';
-import { DynamicTable, DynamicForm, DynamicChart, DynamicNav } from './components';
+import { DynamicTable, DynamicNav } from './components';
+import PropTypes from 'prop-types';
 
 const queryClient = new QueryClient();
-const { Header, Sider, Content } = Layout;
+const { Header, Content } = Layout;
 
-const createModuleComponent = ({ table, form, charts }) => ({
-  list: () => <DynamicTable {...table} />,
-  form: () => <DynamicForm {...form} />,
-  dashboard: () => (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {charts?.map(chart => <DynamicChart key={chart.key} {...chart} />)}
-    </div>
-  )
-});
-
-export const ModuleComponent = ({ moduleKey, config }) => {
+export const ModuleComponent = ({ config }) => {
   if (!config) return null;
-
+ 
   switch (config.defaultView || 'list') {
     case 'list':
       return <DynamicTable config={config} />;
-    // Add other view types here
     default:
       return null;
   }
+};
+
+ModuleComponent.propTypes = {
+  config: PropTypes.shape({
+    defaultView: PropTypes.string,
+  }).isRequired,
 };
 
 const AppRoutes = () => (
@@ -39,14 +34,14 @@ const AppRoutes = () => (
         <Route 
           key={path} 
           path={path} 
-          element={<ModuleComponent moduleKey={key} config={moduleConfig} />} 
+          element={<ModuleComponent config={moduleConfig} />} 
         />
       );
     })}
   </Routes>
 );
 
-export default () => (
+const App = () => (
   <QueryClientProvider client={queryClient}>
     <ConfigProvider>
       <Router>
@@ -61,3 +56,5 @@ export default () => (
     </ConfigProvider>
   </QueryClientProvider>
 );
+
+export default App;

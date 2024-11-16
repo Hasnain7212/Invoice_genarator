@@ -19,9 +19,9 @@ jobs:
         run: |
           git config --global user.email "hasnainrazalakhani7212@gmail.com"
           git config --global user.name "Hasnain7212"
-          git config --global url."https://${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://${GH_DEPLOY_TOKEN}@github.com/".insteadOf "https://github.com/"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
+          GH_DEPLOY_TOKEN: ${{ secrets.GH_DEPLOY_TOKEN }}  # Use the custom PAT for authentication
 
       - name: Set up Node.js
         uses: actions/setup-node@v3  # Setup Node.js environment
@@ -45,4 +45,4 @@ jobs:
       - name: Deploy to GitHub Pages
         run: npm run deploy  # Deploy using the gh-pages package
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
+          GH_DEPLOY_TOKEN: ${{ secrets.GH_DEPLOY_TOKEN }}  # Use the custom PAT for authentication

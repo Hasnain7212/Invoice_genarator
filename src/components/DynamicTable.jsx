@@ -1,10 +1,29 @@
-// components/DynamicTable.jsx
 import React, { useState, useCallback } from 'react';
 import { Table, Input, Button, Space, Modal, message } from 'antd';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { DynamicForm } from './DynamicForm';
-import { apiHandler } from '../utils/api';
+
+const fetchData = async (endpoint) => {
+  const response = await fetch(endpoint);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+};
+
+const apiHandler = async (endpoint, options = {}) => {
+  const response = await fetch(endpoint, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    ...options,
+  });
+  if (!response.ok) {
+    throw new Error('API request failed');
+  }
+  return response.json();
+};
 
 export const DynamicTable = ({ config }) => {
   const [searchText, setSearchText] = useState('');
@@ -12,16 +31,17 @@ export const DynamicTable = ({ config }) => {
   const [editRecord, setEditRecord] = useState(null);
   const queryClient = useQueryClient();
   
-  const endpoint = config.endpoint;
-  const columns = config.columns || [];
+  const endpoint = config.table?.endpoint || config.endpoint;
 
   const { data = [], isLoading, error } = useQuery(
     ['table', endpoint],
-    () => apiHandler(endpoint),
+    () => fetchData(endpoint),
     {
-      retry: 3,
-      staleTime: 30000,
-      onError: (error) => message.error(`Failed to fetch data: ${error.message}`)
+      refetchOnWindowFocus: false,
+      retry: 1,
+      onError: (error) => {
+        message.error(`Failed to fetch data: ${error.message}`);
+      }
     }
   );
 
@@ -40,6 +60,9 @@ export const DynamicTable = ({ config }) => {
       onSuccess: () => {
         handleMutationSuccess();
         message.success('Record created successfully');
+      },
+      onError: (error) => {
+        message.error(`Failed to create record: ${error.message}`);
       }
     }
   );
@@ -53,6 +76,9 @@ export const DynamicTable = ({ config }) => {
       onSuccess: () => {
         handleMutationSuccess();
         message.success('Record updated successfully');
+      },
+      onError: (error) => {
+        message.error(`Failed to update record: ${error.message}`);
       }
     }
   );
@@ -63,6 +89,9 @@ export const DynamicTable = ({ config }) => {
       onSuccess: () => {
         queryClient.invalidateQueries(['table', endpoint]);
         message.success('Record deleted successfully');
+      },
+      onError: (error) => {
+        message.error(`Failed to delete record: ${error.message}`);
       }
     }
   );
@@ -75,9 +104,11 @@ export const DynamicTable = ({ config }) => {
     }
   };
 
+  const columns = config.table?.columns || config.columns || [];
   const tableColumns = [
     ...columns.map(col => ({
       ...col,
+      dataIndex: col.key,
       sorter: col.sorter ? (a, b) => {
         if (typeof a[col.key] === 'string') {
           return a[col.key]?.localeCompare(b[col.key]);
@@ -86,13 +117,16 @@ export const DynamicTable = ({ config }) => {
       } : false,
       filteredValue: col.search ? [searchText] : null,
       onFilter: col.search ? (value, record) =>
-        record[col.key]?.toString().toLowerCase().includes(value.toLowerCase()) : null,
+        String(record[col.key]).toLowerCase().includes(value.toLowerCase()) : null,
       render: (text, record) => {
         if (col.type === 'currency') {
           return new Intl.NumberFormat('en-US', { 
             style: 'currency', 
             currency: 'USD' 
           }).format(text || 0);
+        }
+        if (col.type === 'date') {
+          return text ? new Date(text).toLocaleDateString() : '-';
         }
         return text || '-';
       }
@@ -130,25 +164,19 @@ export const DynamicTable = ({ config }) => {
   ];
 
   if (error) {
-    return (
-      <div className="p-4 text-red-500">
-        Error loading data: {error.message}. Please try again later.
-      </div>
-    );
+    return <div>Error loading data: {error.message}</div>;
   }
 
   return (
-    <div className="p-4">
-      <div className="mb-4 flex justify-between items-center">
-        <Space>
-          <Input
-            placeholder="Search..."
-            prefix={<SearchOutlined />}
-            onChange={e => setSearchText(e.target.value)}
-            style={{ width: 200 }}
-            allowClear
-          />
-        </Space>
+    <div>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
+        <Input
+          placeholder="Search..."
+          prefix={<SearchOutlined />}
+          onChange={e => setSearchText(e.target.value)}
+          style={{ width: 200 }}
+          allowClear
+        />
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -193,4 +221,4 @@ export const DynamicTable = ({ config }) => {
       </Modal>
     </div>
   );
-};
+}

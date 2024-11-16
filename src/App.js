@@ -1,55 +1,58 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Layout, ConfigProvider } from 'antd';
+import { Layout, ConfigProvider, theme } from 'antd';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import metadata from './metadata.json';
 import { DynamicTable, DynamicNav } from './components';
 import PropTypes from 'prop-types';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1
+    }
+  }
+});
+
 const { Header, Content } = Layout;
 
-export const ModuleComponent = ({ config }) => {
+const ModuleComponent = ({ config }) => {
   if (!config) return null;
- 
-  switch (config.defaultView || 'list') {
-    case 'list':
-      return <DynamicTable config={config} />;
-    default:
-      return null;
-  }
+  return <DynamicTable config={config.table || config} />;
 };
 
 ModuleComponent.propTypes = {
-  config: PropTypes.shape({
-    defaultView: PropTypes.string,
-  }).isRequired,
+  config: PropTypes.object.isRequired,
 };
 
 const AppRoutes = () => (
   <Routes>
-    {metadata.app.navigation.items.map(({ path, key }) => {
-      const moduleConfig = metadata.modules[key];
-      return (
-        <Route 
-          key={path} 
-          path={path} 
-          element={<ModuleComponent config={moduleConfig} />} 
-        />
-      );
-    })}
+    {metadata.app.navigation.items.map(({ path, key }) => (
+      <Route 
+        key={path} 
+        path={path} 
+        element={<ModuleComponent config={metadata.modules[key]} />} 
+      />
+    ))}
   </Routes>
 );
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ConfigProvider>
+    <ConfigProvider
+      theme={{
+        algorithm: theme.defaultAlgorithm,
+      }}
+    >
       <Router>
-        <Layout className="min-h-screen">
+        <Layout style={{ minHeight: '100vh' }}>
           <DynamicNav items={metadata.app.navigation.items} />
           <Layout>
-            <Header className="bg-white p-0" />
-            <Content className="m-4"><AppRoutes /></Content>
+            <Header style={{ background: '#fff', padding: 0 }} />
+            <Content style={{ margin: '24px 16px' }}>
+              <AppRoutes />
+            </Content>
           </Layout>
         </Layout>
       </Router>

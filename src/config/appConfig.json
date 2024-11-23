@@ -1,0 +1,92 @@
+{
+    "app": {
+      "title": "Dynamic Business System",
+      "theme": "light",
+      "navigation": {
+        "type": "sidebar",
+        "items": [
+          {"key": "dashboard", "path": "/", "icon": "DashboardOutlined", "label": "Dashboard"},
+          {"key": "inventory", "path": "/inventory", "icon": "ShoppingCartOutlined", "label": "Inventory"},
+          {"key": "categories", "path": "/categories", "icon": "TagOutlined", "label": "Categories"},
+          {"key": "suppliers", "path": "/suppliers", "icon": "UserOutlined", "label": "Suppliers"},
+          {"key": "customers", "path": "/customers", "icon": "TeamOutlined", "label": "Customers"},
+          {"key": "invoices", "path": "/invoices", "icon": "FileTextOutlined", "label": "Invoices"}
+        ]
+      }
+    },
+    "modules": {
+      "categories": {
+        "title": "Categories",
+        "endpoint": "http://127.0.0.1:5000/api/categories",
+        "table": {
+          "columns": [
+            {"key": "name", "title": "Name", "sorter": true, "search": true},
+            {"key": "description", "title": "Description"}
+          ]
+        },
+        "form": {
+          "fields": [
+            {"key": "name", "label": "Category Name", "type": "text", "required": true},
+            {"key": "description", "label": "Description", "type": "textarea"}
+          ]
+        }
+      },
+      "suppliers": {
+        "title": "Suppliers",
+        "endpoint": "http://127.0.0.1:5000/api/suppliers",
+        "table": {
+          "columns": [
+            {"key": "name", "title": "Name", "sorter": true, "search": true},
+            {"key": "contact", "title": "Contact Info"}
+          ]
+        },
+        "form": {
+          "fields": [
+            {"key": "name", "label": "Supplier Name", "type": "text", "required": true},
+            {"key": "contact", "label": "Contact Info", "type": "text"}
+          ]
+        }
+      },
+      "customers": {
+        "title": "Customers",
+        "endpoint": "http://127.0.0.1:5000/api/customers",
+        "table": {
+          "columns": [
+            {"key": "name", "title": "Name", "sorter": true, "search": true},
+            {"key": "email", "title": "Email"}
+          ]
+        },
+        "form": {
+          "fields": [
+            {"key": "name", "label": "Customer Name", "type": "text", "required": true},
+            {"key": "email", "label": "Email", "type": "email"}
+          ]
+        }
+      },
+      "inventory": {
+        "title": "Inventory",
+        "endpoint": "http://127.0.0.1:5000/api/inventory",
+        "table": {
+          "columns": [
+            {"key": "name", "title": "Name", "sorter": true, "search": true},
+            {"key": "category", "title": "Category", "relation": {"module": "categories", "key": "id", "value": "name"}},
+            {"key": "suppliers", "title": "Suppliers", "relation": {"module": "suppliers", "key": "id", "value": "name"}, "type": "array"},
+            {"key": "customers", "title": "Customers", "relation": {"module": "customers", "key": "id", "value": "name"}, "type": "array"},
+            {"key": "quantity", "title": "Quantity", "type": "number"},
+            {"key": "price", "title": "Price", "type": "currency"}
+          ]
+        },
+        "form": {
+          "fields": [
+            {"key": "name", "label": "Product Name", "type": "text", "required": true},
+            {"key": "category", "label": "Category", "type": "select", "required": true, "relation": {"module": "categories", "key": "id", "value": "name"}},
+            {"key": "suppliers", "label": "Suppliers", "type": "multi-select", "relation": {"module": "suppliers", "key": "id", "value": "name"}},
+            {"key": "customers", "label": "Customers", "type": "multi-select", "relation": {"module": "customers", "key": "id", "value": "name"}},
+            {"key": "quantity", "label": "Quantity", "type": "number", "required": true, "min": 0},
+            {"key": "price", "label": "Price", "type": "currency", "required": true, "min": 0}
+          ]
+        }
+      }
+    }
+  }
+  

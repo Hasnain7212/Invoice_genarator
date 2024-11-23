@@ -1,66 +1,44 @@
 {
-    "app": {
-      "title": "Dynamic Business System",
-      "theme": "light",
-      "navigation": {
-        "type": "sidebar",
-        "items": [
-          {"key": "dashboard", "path": "/", "icon": "DashboardOutlined", "label": "Dashboard"},
-          {"key": "inventory", "path": "/inventory", "icon": "ShoppingCartOutlined", "label": "Inventory"},
-          {"key": "invoices", "path": "/invoices", "icon": "FileTextOutlined", "label": "Invoices"},
-          {"key": "sales", "path": "/sales", "icon": "BarChartOutlined", "label": "Sales"},
-          {"key": "templates", "path": "/templates", "icon": "FileOutlined", "label": "Templates"}
-        ]
-      }
+  "app": {"title": "Dynamic Business System", "theme": "light", "navigation": {"type": "sidebar", "items": [
+    {"key": "dashboard", "path": "/", "icon": "DashboardOutlined", "label": "Dashboard"},
+    {"key": "inventory", "path": "/inventory", "icon": "ShoppingCartOutlined", "label": "Inventory"},
+    {"key": "invoices", "path": "/invoices", "icon": "FileTextOutlined", "label": "Invoices"}]}},
+  "modules": {
+    "inventory": {
+      "title": "Inventory",
+      "table": {
+        "endpoint": "/api/inventory",
+        "columns": [
+        {"key": "name", "title": "Name", "sorter": true, "search": true},
+        {"key": "quantity", "title": "Quantity", "type": "number"},
+        {"key": "price", "title": "Price", "type": "currency"},
+        {"key": "category", "title": "Category", "filter": true},
+        {"key": "supplier", "title": "Supplier", "filter": true}]},
+      "form": {"fields": [
+        {"key": "name", "label": "Product Name", "type": "text", "required": true},
+        {"key": "quantity", "label": "Quantity", "type": "number", "required": true, "min": 0},
+        {"key": "price", "label": "Price", "type": "currency", "required": true, "min": 0},
+        {"key": "category", "label": "Category", "type": "select", "required": true, "options": [
+          {"id": "electronics", "name": "Electronics"},
+          {"id": "clothing", "name": "Clothing"}]},
+        {"key": "supplier", "label": "Supplier", "type": "select", "required": true, "options": [
+          {"id": "supplier1", "name": "Supplier One"},
+          {"id": "supplier2", "name": "Supplier Two"}]}]}
     },
-    "modules": {
-      "inventory": {
-        "title": "Inventory Management",
-        "endpoint": "http://127.0.0.1:5000/api/inventory",
-        "table": {
-          "endpoint": "http://127.0.0.1:5000/api/inventory",
-          "columns": [
-            {"key": "name", "title": "Name", "sorter": true, "search": true},
-            {"key": "quantity", "title": "Quantity", "type": "number"},
-            {"key": "price", "title": "Price", "type": "currency"},
-            {"key": "category", "title": "Category", "filter": true},
-            {"key": "supplier", "title": "Supplier", "filter": true},
-            {"key": "reorder_point", "title": "Reorder Point", "type": "number"}
-          ]
-        },
-        "form": {
-          "fields": [
-            {"key": "name", "label": "Name", "type": "text", "required": true},
-            {"key": "quantity", "label": "Quantity", "type": "number", "required": true},
-            {"key": "price", "label": "Price", "type": "number", "required": true},
-            {"key": "category", "label": "Category", "type": "select", "options": "categories"},
-            {"key": "supplier", "label": "Supplier", "type": "select", "options": "suppliers"},
-            {"key": "reorder_point", "label": "Reorder Point", "type": "number"}
-          ]
-        }
-      },
-      "invoices": {
-        "title": "Invoice Management",
-        "endpoint": "/api/invoices",
-        "table": {
-          "endpoint": "http://127.0.0.1:5000/api/invoices",
-          "columns": [
-            {"key": "invoice_number", "title": "Invoice #", "sorter": true},
-            {"key": "customer_name", "title": "Customer", "search": true},
-            {"key": "total_amount", "title": "Amount", "type": "currency"},
-            {"key": "status", "title": "Status", "filter": true},
-            {"key": "date", "title": "Date", "type": "date", "sorter": true}
-          ]
-        },
-        "form": {
-          "fields": [
-            {"key": "customer_name", "label": "Customer", "type": "text", "required": true},
-            {"key": "items", "label": "Items", "type": "itemSelect", "source": "inventory"},
-            {"key": "template_id", "label": "Template", "type": "select", "options": "templates"},
-            {"key": "due_date", "label": "Due Date", "type": "date"},
-            {"key": "notes", "label": "Notes", "type": "textarea"}
-          ]
-        }
-      }
+    "invoices": {
+      "title": "Invoices",
+      "endpoint": "/api/invoices",
+      "table": {"columns": [
+        {"key": "invoice_number", "title": "Invoice #", "sorter": true},
+        {"key": "customer_name", "title": "Customer", "search": true},
+        {"key": "total_amount", "title": "Amount", "type": "currency"},
+        {"key": "status", "title": "Status", "filter": true}]},
+      "form": {"fields": [
+        {"key": "customer_name", "label": "Customer Name", "type": "text", "required": true},
+        {"key": "total_amount", "label": "Amount", "type": "currency", "required": true, "min": 0},
+        {"key": "status", "label": "Status", "type": "select", "required": true, "options": [
+          {"id": "pending", "name": "Pending"},
+          {"id": "paid", "name": "Paid"}]}]}
     }
   }
+}

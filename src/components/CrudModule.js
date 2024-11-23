@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Button, Modal, Form, Input, Select, InputNumber, message, Space, Spin } from 'antd';
 import { fetchAll, createItem, updateItem, deleteItem } from './api';
 import config from '../config/appConfig.json';
@@ -38,23 +38,23 @@ const CrudModule = ({ module }) => {
     }
   };
 
-  useEffect(() => {
-    const loadAllRelatedData = async () => {
-      // Get all fields that have relations
-      const relatedFields = module.form.fields.filter(field => field.relation);
-      
-      // Load data for each related field
-      await Promise.all(
-        relatedFields.map(field => loadRelatedData(field.key, field.relation))
-      );
-    };
+  const loadAllRelatedData = useCallback(async () => {
+    // Get all fields that have relations
+    const relatedFields = module.form.fields.filter(field => field.relation);
+    
+    // Load data for each related field
+    await Promise.all(
+      relatedFields.map(field => loadRelatedData(field.key, field.relation))
+    );
+  }, [module]);
 
+  useEffect(() => {
     if (module.form?.fields) {
       loadAllRelatedData();
     }
-  }, [module]);
+  }, [module, loadAllRelatedData]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetchAll(module.endpoint);
@@ -65,11 +65,11 @@ const CrudModule = ({ module }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [module]);
 
   useEffect(() => {
     loadData();
-  }, [module]);
+  }, [module, loadData]);
 
   const handleSubmit = async (values) => {
     try {
@@ -266,12 +266,10 @@ const CrudModule = ({ module }) => {
                 key={field.key}
                 name={field.key}
                 label={field.label}
-                rules={[
-                  { 
-                    required: field.required, 
-                    message: `Please input ${field.label}!` 
-                  }
-                ]}
+                rules={[{ 
+                  required: field.required, 
+                  message: `Please input ${field.label}!` 
+                }]}
               >
                 {renderFormField(field)}
               </Form.Item>

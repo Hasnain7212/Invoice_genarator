@@ -1,63 +1,29 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import MainLayout from './components/MainLayout';
+import CrudModule from './components/CrudModule';
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Layout, ConfigProvider, theme } from 'antd';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import metadata from './metadata.json';
-import { DynamicTable, DynamicNav } from './components';
-import PropTypes from 'prop-types';
+import config from './config/appConfig.json'; // Adjust the path if necessary
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1
-    }
-  }
-});
-
-const { Header, Content } = Layout;
-
-const ModuleComponent = ({ config }) => {
-  if (!config) return null;
-  return <DynamicTable config={config.table || config} />;
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout config={config.app} />}>
+          {/* Dashboard route */}
+          <Route path="/" element={<div>Dashboard</div>} />
+          
+          {/* Module routes */}
+          {Object.entries(config.modules).map(([key, module]) => (
+            <Route
+              key={key}
+              path={`/${key}`}
+              element={<CrudModule module={module} />}
+            />
+          ))}
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 };
-
-ModuleComponent.propTypes = {
-  config: PropTypes.object.isRequired,
-};
-
-const AppRoutes = () => (
-  <Routes>
-    {metadata.app.navigation.items.map(({ path, key }) => (
-      <Route 
-        key={path} 
-        path={path} 
-        element={<ModuleComponent config={metadata.modules[key]} />} 
-      />
-    ))}
-  </Routes>
-);
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ConfigProvider
-      theme={{
-        algorithm: theme.defaultAlgorithm,
-      }}
-    >
-      <Router>
-        <Layout style={{ minHeight: '100vh' }}>
-          <DynamicNav items={metadata.app.navigation.items} />
-          <Layout>
-            <Header style={{ background: '#fff', padding: 0 }} />
-            <Content style={{ margin: '24px 16px' }}>
-              <AppRoutes />
-            </Content>
-          </Layout>
-        </Layout>
-      </Router>
-    </ConfigProvider>
-  </QueryClientProvider>
-);
 
 export default App;

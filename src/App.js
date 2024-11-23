@@ -6,7 +6,7 @@ import config from './config/appConfig.json'; // Adjust the path if necessary
 
 const App = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="Hasnain7212/my-invoice-app"> {/* Add the basename here */}
       <Routes>
         <Route element={<MainLayout config={config.app} />}>
           {/* Dashboard route */}
